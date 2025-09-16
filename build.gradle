@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id("io.qameta.allure") version "2.11.2"
 }
 
 group = 'org.example'
@@ -14,10 +15,21 @@ dependencies {
     // https://mvnrepository.com/artifact/io.rest-assured/rest-assured
     testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.3.0'
     testImplementation group: 'org.json', name: 'json', version: '20220924'
+    // https://mvnrepository.com/artifact/io.rest-assured/json-schema-validator
+    implementation group: 'io.rest-assured', name: 'json-schema-validator', version: '5.3.0'
+    // integrasi RestAssured + Allure
+    testImplementation "io.qameta.allure:allure-testng:2.24.0"
+    testImplementation "io.qameta.allure:allure-rest-assured:2.24.0"
 }
 
 test {
-    useTestNG()
+    useTestNG{
+        suites "src/test/resources/testng.xml"
+    }
+
+    testLogging {
+        events "PASSED", "FAILED", "SKIPPED"  //Menampilkan status setiap test (PASSED, FAILED, atau SKIPPED) langsung di console setelah  jalankan gradlew clean test.
+    }
 //    systemProperty 'http.proxyHost', 'proxy.host.com'
 //    systemProperty 'http.proxyPort', '8080'
 //    systemProperty 'https.proxyHost', 'proxy.host.com'
@@ -26,3 +38,4 @@ test {
 //    systemProperty 'http.nonProxyHosts', 'localhost|127.0.0.1|reqres.in'
 //    systemProperty 'https.nonProxyHosts', 'localhost|127.0.0.1|reqres.in'
 }
+
