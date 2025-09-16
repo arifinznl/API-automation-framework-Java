@@ -5,7 +5,8 @@ import org.hamcrest.Matchers;
 import org.json.JSONObject;
 import org.testng.annotations.Test;
 import io.restassured.http.ContentType;
-
+import java.util.HashMap;
+import java.util.Map;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -51,6 +52,7 @@ public class TestReqres {
 
         RestAssured
                 .given()
+                .header("x-api-key", "reqres-free-v1")
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
                 .body(bodyObj.toString())
@@ -64,16 +66,38 @@ public class TestReqres {
 
 
     @Test
-    public void updateUser() {
-        String body = "{ \"name\": \"morpheus\", \"job\": \"zion resident\" }";
+    public void testPutUser() {
+        RestAssured.baseURI = "https://reqres.in";
+        int userId = 2;
+        String newName = "updatedUser";
 
-        given()
-                .contentType(ContentType.JSON)
-                .body(body)
+        // Ambil data lama dulu (biar konsisten)
+        String fname = given().when().get("api/users/" + userId).getBody().jsonPath().get("data.first_name");
+        String lname = given().when().get("api/users/" + userId).getBody().jsonPath().get("data.last_name");
+        String avatar = given().when().get("api/users/" + userId).getBody().jsonPath().get("data.avatar");
+        String email = given().when().get("api/users/" + userId).getBody().jsonPath().get("data.email");
+        System.out.println("Last name before = " + lname);
+
+        // Body hanya update last_name saja
+        HashMap<String, Object> bodyMap = new HashMap<>();
+        bodyMap.put("id", 2);
+        bodyMap.put("last_name", "Weaver");
+        bodyMap.put("avatar", "https://reqres.in/img/faces/2-image.jpg");
+        bodyMap.put("first_name", "updatedUser");
+        bodyMap.put("email", "janet.weaver@reqres.in");
+        JSONObject jsonObject = new JSONObject(bodyMap);
+
+        given().log().all()
+                .header("x-api-key", "reqres-free-v1")
+                .header("Content-Type", "application/json")
+                .body(jsonObject.toString())
                 .when()
-                .put("/api/users/2")
-                .then()
-                .statusCode(200) // response PUT di reqres.in seharusnya 200 OK
-                .body("job", equalTo("zion resident"));
+                .patch("api/users/" + userId)
+                .then().log().all()
+                .assertThat().statusCode(200)
+                .assertThat().body("first_name", Matchers.equalTo(newName));
+
+        System.out.println("Last name after = " + newName);
     }
+
 }
