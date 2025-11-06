@@ -74,16 +74,6 @@ public class TestReqres extends apiauto.config.BaseTest {
         String email = given().when().get("api/users/" + userId).getBody().jsonPath().get("data.email");
         System.out.println("Last name before = " + lname);
 
-
-        // Body hanya update last_name saja
-        HashMap<String, Object> bodyMap = new HashMap<>();
-        bodyMap.put("id", 2);
-        bodyMap.put("last_name", "Weaver");
-        bodyMap.put("avatar", "https://reqres.in/img/faces/2-image.jpg");
-        bodyMap.put("first_name", "updatedUser");
-        bodyMap.put("email", "janet.weaver@reqres.in");
-        JSONObject jsonObject = new JSONObject(bodyMap);
-
         // Body hanya update last_name saja
         HashMap<String, Object> bodyMap = new HashMap<>();
         bodyMap.put("id", 2);
